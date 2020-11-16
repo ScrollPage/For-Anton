@@ -27,7 +27,7 @@
 							<input type="text" placeholder="Search">
 						</div>
 						<div class="header__ask">
-							<button class="btn btn-primary">ASK!</button>
+							<button class="btn btn-primary" onclick="location.href='{% url  'create-question' %}'">ASK!</button>
 						</div>
 					</div>
 				</div>
@@ -37,13 +37,16 @@
 							<img src="{% static 'img/avatar.png' %}" alt="Avatar">
 						</div>
 						<div class="header__info">
-							<div class="header__name">
-								Mr.Pepper
-							</div>
-							<div class="header__links">
-								<a href="">settings</a>
-								<a href="">logout</a>
-							</div>
+							{% if request.user.is_authenticated %}	
+								<div class="header__name">{{ request.user }}</div>
+								<div class="header__links">
+									<a href="{% url 'logout' %}">logout</a>
+								</div>
+							{% else %}
+								<div class="header__links">
+									<a href="{% url 'login' %}">login</a>
+								</div>
+							{% endif %}
 						</div>
 					</div>
 				</div>
@@ -86,31 +89,25 @@
 										<div class="question__main">
 											<div class="question__title">
 												<a href="">
-													<h3>How to build a moon park?</h3>
+													<h3>{{ question.question }}</h3>
 												</a>
 											</div>
 											<div class="question__subtitle">
-												<p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Minima non
-													quibusdam est nisi aperiam ad accusantium nobis perferendis
-													perspiciatis recusandae ut et maxime, ducimus tempora, veniam totam
-													dolores possimus nemo iusto? Laudantium impedit provident, earum
-													aperiam deserunt dolorem fugit quo labore eius velit, modi illum
-													saepe ullam quae laboriosam numquam.</p>
+												<p>{{ question.content }}</p>
 											</div>
 											<div class="question__footer">
 												<div class="question__answer">
 													<a href="">
-														<p>answer(3)</p>
+														<p>{{ question.num_comments }}</p>
 													</a>
 												</div>
 												<div class="question__tags">
 													<h4>Tags:</h4>
-													<a href="">
-														<p>black jack</p>
-													</a>
-													<a href="">
-														<p>bender</p>
-													</a>
+													{% for tag in question.tags.all %}
+														<a href="">
+															<p>{{ tag }}</p>
+														</a>
+													{% endfor %}
 												</div>
 											</div>
 										</div>
@@ -119,138 +116,49 @@
 							</div>
 						</div>
 						<div class="answer">
-							<div class="answer__item question__item">
-								<div class="row">
-									<div class="col-2">
-										<div class="question__left">
-											<div class="question__avatar">
-												<img src="/src/img/avatar.png" alt="">
-											</div>
-											<div class="question__likes">
-												<div class="question__like">
-													<p>5</p>
+							{% if question.answers.all %}
+								{% for answer in question.answers.all %}
+									<div class="answer__item question__item">
+										<div class="row">
+											<div class="col-2">
+												<div class="question__left">
+													<div class="question__avatar">
+														<img src="/src/img/avatar.png" alt="">
+													</div>
+													<div class="question__likes">
+														<div class="question__like">
+															<p>5</p>
+														</div>
+														<div class="question__btns">
+															<button>&#9650;</button>
+															<button>&#9660;</button>
+														</div>
+													</div>
 												</div>
-												<div class="question__btns">
-													<button>&#9650;</button>
-													<button>&#9660;</button>
-												</div>
 											</div>
-										</div>
-									</div>
-									<div class="col-10">
-										<div class="question__main">
-											<div class="question__subtitle">
-												<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum
-													excepturi delectus iusto quam architecto qui aliquid, adipisci iste
-													debitis numquam eum quasi et natus tenetur repellendus blanditiis
-													perspiciatis est id veniam laborum inventore dicta reiciendis.</p>
-											</div>
-											<div class="question__footer">
-												<label>
-													<input type="checkbox" name="happy" value="yes"> Correct!
-												</label>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="answer__item question__item">
-								<div class="row">
-									<div class="col-2">
-										<div class="question__left">
-											<div class="question__avatar">
-												<img src="/src/img/avatar.png" alt="">
-											</div>
-											<div class="question__likes">
-												<div class="question__like">
-													<p>5</p>
-												</div>
-												<div class="question__btns">
-													<button>&#9650;</button>
-													<button>&#9660;</button>
+											<div class="col-10">
+												<div class="question__main">
+													<div class="question__subtitle">
+														<p>{{ answer.user }}</p>
+														<p>{{ answer.content }}</p>
+													</div>
 												</div>
 											</div>
 										</div>
 									</div>
-									<div class="col-10">
-										<div class="question__main">
-											<div class="question__subtitle">
-												<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum
-													excepturi delectus iusto quam architecto qui aliquid, adipisci iste
-													debitis numquam eum quasi et natus tenetur repellendus blanditiis
-													perspiciatis est id veniam laborum inventore dicta reiciendis.</p>
-											</div>
-											<div class="question__footer">
-												<label>
-													<input type="checkbox" name="happy" value="yes"> Correct!
-												</label>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
+								{% endfor %}
+							{% else %}
+								<p>Здесь пока нет ответов</p> 
+							{% endif %}
 						</div>
 						<div class="textarea">
-							<form action="">
-								<textarea name="answer" id="answer" rows="10"></textarea>
+							<form action="{% url 'create-answer' question.id %}" method='POST'>
+								{% csrf_token %}
+								<textarea name="content" id="answer" rows="10"></textarea>
 								<div class="textarea__btn">
 									<button type="submit" class="btn btn-primary">Answer</button>
 								</div>
 							</form>
-						</div>
-					</div>
-				</div>
-				<div class="col-4">
-					<div class="sidebar">
-						<div class="sidebar__item">
-							<div class="sidebar__title">
-								<h2>Sort by:</h2>
-							</div>
-							<div class="sidebar__form">
-								<form action="">
-									<p><input name="radio" type="radio" value="date" checked> date</p>
-									<p><input name="radio" type="radio" value="likes"> likes</p>
-									<p><button class="btn btn-primary" type="submit">Выбрать</button></p>
-								</form>
-							</div>
-						</div>
-						<div class="sidebar__item">
-							<div class="sidebar__title">
-								<h2>Popular Tags</h2>
-							</div>
-							<div class="sidebar__tags">
-								<p class="sidebar__tag">perl</p>
-								<p class="sidebar__tag sidebar__tag--red">python</p>
-								<p class="sidebar__tag">TechnoPark</p>
-								<p class="sidebar__tag sidebar__tag--red">MySQL</p>
-								<p class="sidebar__tag sidebar__tag--green">django</p>
-								<p class="sidebar__tag">Mail.ru</p>
-								<p class="sidebar__tag">Voloshin</p>
-								<p class="sidebar__tag sidebar__tag--yellow">FireFox</p>
-							</div>
-						</div>
-						<div class="sidebar__item">
-							<div class="sidebar__title">
-								<h2>BestMembers</h2>
-							</div>
-							<div class="sidebar__members">
-								<div class="sidebar__member">
-									<a href="">Mr.Freeman</a>
-								</div>
-								<div class="sidebar__member">
-									<a href="">Dr.House</a>
-								</div>
-								<div class="sidebar__member">
-									<a href="">Bender</a>
-								</div>
-								<div class="sidebar__member">
-									<a href="">Queen Victoria</a>
-								</div>
-								<div class="sidebar__member">
-									<a href="">V.Pupkin</a>
-								</div>
-
-							</div>
 						</div>
 					</div>
 				</div>

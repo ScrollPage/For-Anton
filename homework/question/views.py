@@ -1,10 +1,13 @@
 from django.views.generic import ListView, DetailView
 from django.db.models import Count
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.views.generic.base import View
 from django.http import HttpResponse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import Question, Tag
+from .models import Question, Tag, Answer
 from .forms import AnswerCreateForm, QuestionCreateForm
 
 class TagNames:
@@ -19,42 +22,74 @@ class QuestionView(ListView, TagNames):
 	def get_queryset(self):
 		queryset = Question.objects.all() \
 			.annotate(num_likes=Count('likes', distinct=True)) \
-			.annotate(num_comments=Count('answers', distinct=True)) \
-			.filter(tags__slug__in=self.request.GET.getlist('tags'))
+			.annotate(num_comments=Count('answers', distinct=True))
 
-		if self.request.GET.get('popularity'):
-			return queryset.order_by('-num_likes')
+		if self.request.GET.getlist('tags'):
+			queryset = queryset \
+				.filter(tags__slug__in=self.request.GET.getlist('tags'))
+
+		if self.request.GET.get('radio') == 'popularity':
+			queryset = queryset.order_by('-num_likes')
 		else:
-			return queryset.order_by('-timestamp')
+			queryset = queryset.order_by('-timestamp')
+
+		paginator = Paginator(queryset, 10)
+
+		page = self.request.GET.get('page')
+		try:
+			queryset = paginator.page(page)
+		except PageNotAnInteger:
+			queryset = paginator.page(1)
+		except EmptyPage:
+			queryset = paginator.page(paginator.num_pages)
+
+		return queryset.object_list
 
 class QuestionDetailView(DetailView):
 	'''Вопрос по айди'''
 	model = Question
 
-class CreateQuestionView(View):
+	def get_queryset(self):
+		return Question.objects.all() \
+			.annotate(num_likes=Count('likes', distinct=True)) \
+			.annotate(num_comments=Count('answers', distinct=True)) \
+
+class CreateQuestionView(TagNames, View):
 	'''Создание вопроса'''
 
-	@login_required
 	def post(self, request, *args, **kwargs):
-		form = QuestionCreateForm(request.POST)
-		if form.is_valid():
-			form.save(commit=False)
-			form.user = self.request.user
-			form.save()
+		data = request.POST
+		if data.get('question', None) and data.get('content', None):
+			question = Question.objects.create(
+				question=data['question'],
+				content=data['content'],
+				user=request.user
+			)
+			for tag in data.getlist('tags', []):
+				question.tags.add(get_object_or_404(Tag, slug=tag))
 		return redirect(reverse('question-list'))
+
+	def get(self, request, *args, **kwargs):
+		return render(request, 'question/question_create.html', context={'tags': Tag.objects.all()})
 
 class CreateAnswerView(View):
 	'''Создание ответа'''
 
-	@login_required
 	def post(self, request, *args, **kwargs):
-		form = AnswerCreateForm(request.POST)
-		if form.is_valid():
-			form.save(commit=False)
-			form.question_id = kwargs['pk']
-			form.user = request.user
-			form.save()
+		content = request.POST.get('content', None)
+		print(request.POST)
+		if content:
+			ans = Answer.objects.create(
+				user=request.user,
+				question_id=kwargs['pk'],
+				content=content
+			)
+			print(ans)
 		return redirect(reverse('question-detail', kwargs=kwargs))
+
+	# def get(self, request, *args, **kwargs):
+		# return redirect(reverse('question-detail', kwargs=kwargs, context={'user': request.user}))
+
 
 class CreateLike(View):
 	'''Создание лайка'''

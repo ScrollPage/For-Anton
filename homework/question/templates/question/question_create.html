@@ -60,31 +60,32 @@
 				<div class="col-8">
 					<div class="login">
 						<div class="login__header">
-							<h2>Log In</h2>
+							<h2>Ask a question!</h2>
 						</div>
-						<div class="login__error">
-							<p>Sorry, wrong password</p>
-						</div>
-						<form action="{% url 'login' %}" method="post">
+						<form action="{% url 'create-question' %}" method="post">
 							{% csrf_token %}
 							<div class="form__input">
-								<label for="login">Email</label>
-								<input type="text" name="email" id="login" placeholder="Enter your email here">
+								<label>Question</label>
+								<input type="text" id="login" placeholder="Your question here" name="question">
 							</div>
 							<div class="form__input">
-								<label for="password">Password</label>
-								<input type="password" name="password" id="password" placeholder="*****">
+								<label>Content</label>
+								<textarea type="text" id="answer" placeholder="....." rows="10" name="content"></textarea>
+							</div>
+							<div class="form__input">
+								<label>Content</label>
+								<select name="tags" id="tags" multiple>
+									{% for tag in tags %}
+										<option value="{{ tag }}">{{ tag }}</option>
+									{% endfor %}
+								</select>
 							</div>
 							<div class="form__submit">
-								<button class="btn btn-primary" type="submit">Log in!</button>
+								<button class="btn btn-primary" type="submit">ASK!</button>
 							</div>
 						</form>
-						<div class="login__register">
-							<a href="{% url 'register' %}">create new account</a>
-						</div>
 					</div>
 				</div>
-
 			</div>
 		</div>
 	</section>

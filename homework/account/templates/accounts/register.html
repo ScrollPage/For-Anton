@@ -28,7 +28,7 @@
 							<input type="text" placeholder="Search">
 						</div>
 						<div class="header__ask">
-							<button class="btn btn-primary">ASK!</button>
+							<button class="btn btn-primary" onclick="location.href='{% url  'create-question' %}'">ASK!</button>
 						</div>
 					</div>
 				</div>
@@ -65,7 +65,7 @@
 						<div class="login__error">
 							<p>Sorry, this email adress already registered</p>
 						</div>
-						<form action="auth/users/create/" method="POST">
+						<form action="." method="POST">
 							{% csrf_token %}
 							<div class="form__input">
 								<label for="login">Username</label>
@@ -81,7 +81,7 @@
 							</div>
 							<div class="form__input">
 								<label for="repassword">Confirm password</label>
-								<input type="password" name="repassword" id="repassword" placeholder="*****">
+								<input type="password" name="password2" id="repassword" placeholder="*****">
 							</div>
 							<div class="form__submit">
 								<button class="btn btn-primary">Register!</button>

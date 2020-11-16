@@ -27,7 +27,7 @@
 							<input type="text" placeholder="Search">
 						</div>
 						<div class="header__ask">
-							<button class="btn btn-primary">ASK!</button>
+							<button class="btn btn-primary" onclick="location.href='{% url  'create-question' %}'">ASK!</button>
 						</div>
 					</div>
 				</div>
@@ -37,8 +37,8 @@
 							<img src="{% static 'img/avatar.png' %}" alt="Avatar">
 						</div>
 						<div class="header__info">
-							{% if view.request.user.is_authenticated %}	
-								<div class="header__name">{{ view.request.user }}</div>
+							{% if request.user.is_authenticated %}	
+								<div class="header__name">{{ request.user }}</div>
 								<div class="header__links">
 									<a href="{% url 'logout' %}">logout</a>
 								</div>
@@ -89,7 +89,7 @@
 									<div class="col-10">
 										<div class="question__main">
 											<div class="question__title">
-												<a href="">
+												<a href="{% url 'question-detail' question.id %}">
 													<h3>{{ question.question }}</h3>
 												</a>
 											</div>
