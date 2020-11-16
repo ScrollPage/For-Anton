@@ -72,5 +72,3 @@ class CreateLike(View):
 			return HttpResponse('Лайк удален')
 		else:
 			return HttpResponse('Лайк добавлен')
-
-

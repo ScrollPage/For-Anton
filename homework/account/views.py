@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic.base import View
+from django.contrib.auth import logout
+from django.urls import reverse
 
 from .forms import LoginForm
 
@@ -32,6 +34,12 @@ class LoginView(View):
 class LogoutView(View):
 	'''Выход из системы'''
 
-	def post(self, request, *args, **kwargs):
+	def get(self, request, *args, **kwargs):
 		logout(request)
 		return redirect(reverse('question-list'))
+
+class RegisterView(View):
+	'''Регистрация'''
+
+	def get(self, request, *args, **kwargs):
+		return render(request, 'accounts/register.html')
