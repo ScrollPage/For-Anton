@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Question list</title>
+</head>
+<body>
+	{% for tag in view.get_tags %}
+		<p>{{tag}}</p>
+	{% endfor %}
+	{% for question in question_list %}
+		<p>{{ question.timestamp }}</p>
+		<p><a href={{ question.get_absolute_url }}>{{ question.question }}</a></p>
+		{% for tag in question.tags.all %}
+			<p>{{tag}}</p>
+		{% endfor %}
+	{% endfor %}
+</body>
+</html>
