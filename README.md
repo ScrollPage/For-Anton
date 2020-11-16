@@ -1,5 +1,10 @@
-asgiref==3.3.1
-Django==3.1.3
-Pillow==8.0.1
-pytz==2020.4
-sqlparse==0.4.1
+```bash
+pip install virtualenv
+
+python -m venv env
+env\Scripts\activate.bat
+
+pip install -r req.txt
+
+python manage.py runserver
+```
