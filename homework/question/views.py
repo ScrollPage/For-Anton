@@ -107,3 +107,8 @@ class CreateLike(View):
 			return HttpResponse('Лайк удален')
 		else:
 			return HttpResponse('Лайк добавлен')
+
+class EmptyRouteView(View):
+	'''Пустой роут'''
+	def get(self, request, *args, **kwargs):
+		return redirect(reverse('question-list'))
