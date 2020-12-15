@@ -46,10 +46,27 @@ class Answer(models.Model):
 		verbose_name_plural = 'Ответы'
 
 class Like(models.Model):
-	'''Лайк'''
-	question = models.ForeignKey(Question, verbose_name='Лайк к вопросу', on_delete=models.CASCADE, related_name='likes')
+	'''
+	Лайк
+	Модель разрежена для вопросов ответов!
+	'''
+	question = models.ForeignKey(
+		Question, 
+		verbose_name='Лайк к вопросу', 
+		on_delete=models.CASCADE, 
+		related_name='likes',
+		null=True
+	)
+	answer = models.ForeignKey(
+		Answer, 
+		verbose_name='Лайк к вопросу', 
+		on_delete=models.CASCADE, 
+		related_name='likes',
+		null=True
+	)
 	user = models.ForeignKey(Account, verbose_name='Пользователь', on_delete=models.CASCADE)
 
 	class Meta:
 		verbose_name = 'Лайк'
 		verbose_name_plural = 'Лайки'
+		unique_together = (('answer', 'user'), ('question', 'user'))
